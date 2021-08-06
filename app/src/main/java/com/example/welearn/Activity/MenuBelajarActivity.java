@@ -94,14 +94,14 @@ public class MenuBelajarActivity extends AppCompatActivity {
             }
         });
 
-        btn_aksara = (CardView)findViewById(R.id.btn_aksara);
-        btn_aksara.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent j = new Intent(MenuBelajarActivity.this, SoalAksaraActivity.class);
-                startActivity(j);
-            }
-        });
+//        btn_aksara = (CardView)findViewById(R.id.btn_aksara);
+//        btn_aksara.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent j = new Intent(MenuBelajarActivity.this, SoalAksaraActivity.class);
+//                startActivity(j);
+//            }
+//        });
 
         akun = (ImageView)findViewById(R.id.akun);
         akun.setOnClickListener(new View.OnClickListener() {

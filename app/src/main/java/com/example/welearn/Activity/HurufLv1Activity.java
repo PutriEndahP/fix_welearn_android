@@ -70,6 +70,13 @@ public class HurufLv1Activity extends AppCompatActivity {
         id = extras.getInt("id");
 
         btn_back = (ImageView)findViewById(R.id.btn_back);
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(HurufLv1Activity.this, Level0SoalActivity.class);
+                startActivity(i);
+            }
+        });
 
         GoogleCloudTTS googleCloudTTS = GoogleCloudTTSFactory.create(BuildConfig.API_KEY);
         mMainViewModel = new MainViewModel(getApplication(), googleCloudTTS);
@@ -240,7 +247,8 @@ public class HurufLv1Activity extends AppCompatActivity {
                 tokenManager = TokenManager.getInstance(getSharedPreferences("prefs",
                         Context.MODE_PRIVATE));
                 ApiClientWelearn api = ServerWelearn.createService(ApiClientWelearn.class);
-//                Call<ResponsePredict> upload = api.predict(valueList,"9", "Bearer " + tokenManager.getToken());
+
+//                Call<ResponsePredict> upload = api.predict(valueList,"121", "Bearer " + tokenManager.getToken());
                 Call<ResponsePredict> upload = api.predict(valueList,String.valueOf(id_soal), "Bearer " + tokenManager.getToken());
 
                 final SweetAlertDialog pDialog = new SweetAlertDialog(HurufLv1Activity.this, SweetAlertDialog.PROGRESS_TYPE);
@@ -252,30 +260,57 @@ public class HurufLv1Activity extends AppCompatActivity {
                 upload.enqueue(new Callback<ResponsePredict>() {
                     @Override
                     public void onResponse(Call<ResponsePredict> call, Response<ResponsePredict> response) {
-                        if (response.code() == 200) {
+                        if (response.code() == 200 && response.body().getMessage().equals("Benar")) {
                             Log.e("response", response.body().getMessage());
                             pDialog.dismiss();
-                            new SweetAlertDialog(HurufLv1Activity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setTitleText(response.body().getMessage())
-                                    .setContentText("Jawaban Berhasil Disimpan")
+                            new SweetAlertDialog(HurufLv1Activity.this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+//                                    .setTitleText(response.body().getMessage())
+                                    .setTitleText("Jawabanmu : Benar")
+//                                    .setContentText("Jawaban Berhasil Disimpan")
+                                    .setContentText(response.body().getText())
+                                    .setCustomImage(R.drawable.happy)
                                     .setConfirmText("OK")
                                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sDialog) {
                                             sDialog.dismissWithAnimation();
 
+                                            mHurufPad.clear();
+                                            mHurufPad2.clear();
+                                            mHurufPad3.clear();
+                                            Intent intent = new Intent(HurufLv1Activity.this, Level0SoalActivity.class);
+//                                          intent.putExtra("id", id);
+//                                          intent.putExtra("id", String.valueOf(id));
+                                            intent.putExtra("id", String.valueOf(id_soal));
+                                            startActivity(intent);
                                         }
                                     }).show();
+                    } else if (response.code() == 200 && response.body().getMessage().equals("Salah")) {
+                            Log.e("response", response.body().getMessage());
+                            pDialog.dismiss();
+                            new SweetAlertDialog(HurufLv1Activity.this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+//                                    .setTitleText(response.body().getMessage())
+                                    .setTitleText("Jawabanmu : Salah")
+//                                    .setContentText("Jawaban Berhasil Disimpan")
+                                    .setContentText(response.body().getText())
+                                    .setCustomImage(R.drawable.sad)
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sDialog) {
+                                            sDialog.dismissWithAnimation();
 
-                            mHurufPad.clear();
-                            mHurufPad2.clear();
-                            mHurufPad3.clear();
-                            Intent intent = new Intent(HurufLv1Activity.this, LevelHurufActivity.class);
-//                            intent.putExtra("id", id);
-//                            intent.putExtra("id", String.valueOf(id));
-                            intent.putExtra("id", String.valueOf(id_soal));
-                            startActivity(intent);
-                    } else {
+                                            mHurufPad.clear();
+                                            mHurufPad2.clear();
+                                            mHurufPad3.clear();
+                                            Intent intent = new Intent(HurufLv1Activity.this, Level0SoalActivity.class);
+//                                          intent.putExtra("id", id);
+//                                          intent.putExtra("id", String.valueOf(id));
+                                            intent.putExtra("id", String.valueOf(id_soal));
+                                            startActivity(intent);
+                                        }
+                                    }).show();
+                        } else {
                             pDialog.dismiss();
                             Log.e("testes", response.raw().toString());
                             new SweetAlertDialog(HurufLv1Activity.this, SweetAlertDialog.WARNING_TYPE)

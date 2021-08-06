@@ -13,6 +13,10 @@ public class ResponsePredict {
     @Expose
     private String message;
 
+    @SerializedName("text")
+    @Expose
+    private String text;
+
     public String getSuccess() {
         return success;
     }
@@ -25,5 +29,13 @@ public class ResponsePredict {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
