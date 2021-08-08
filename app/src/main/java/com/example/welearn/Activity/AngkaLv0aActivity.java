@@ -201,27 +201,52 @@ public class AngkaLv0aActivity extends AppCompatActivity {
                 upload.enqueue(new Callback<ResponsePredict>() {
                     @Override
                     public void onResponse(Call<ResponsePredict> call, Response<ResponsePredict> response) {
-                        if (response.code() == 200) {
+                        if (response.code() == 200 && response.body().getMessage().equals("Benar")) {
                             Log.e("response", response.body().getMessage());
                             pDialog.dismiss();
-                            new SweetAlertDialog(AngkaLv0aActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setTitleText(response.body().getMessage())
-                                    .setContentText("Berhasil Dikonfirmasi")
+                            new SweetAlertDialog(AngkaLv0aActivity.this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+//                                    .setTitleText(response.body().getMessage())
+                                    .setTitleText("Jawabanmu : Benar")
+//                                    .setContentText("Jawaban Berhasil Disimpan")
+                                    .setContentText(response.body().getText())
+                                    .setCustomImage(R.drawable.happy)
                                     .setConfirmText("OK")
                                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sDialog) {
                                             sDialog.dismissWithAnimation();
 
+                                            padjawabangka1.clear();
+                                            Intent intent = new Intent(AngkaLv0aActivity.this, LevelAngkaActivity.class);
+//                                          intent.putExtra("id", id);
+//                                          intent.putExtra("id", String.valueOf(id));
+                                            intent.putExtra("id", String.valueOf(id_soal));
+                                            startActivity(intent);
                                         }
                                     }).show();
+                        } else if (response.code() == 200 && response.body().getMessage().equals("Salah")) {
+                            Log.e("response", response.body().getMessage());
+                            pDialog.dismiss();
+                            new SweetAlertDialog(AngkaLv0aActivity.this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+//                                    .setTitleText(response.body().getMessage())
+                                    .setTitleText("Jawabanmu : Salah")
+//                                    .setContentText("Jawaban Berhasil Disimpan")
+                                    .setContentText(response.body().getText())
+                                    .setCustomImage(R.drawable.sad)
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sDialog) {
+                                            sDialog.dismissWithAnimation();
 
-                            padjawabangka1.clear();
-                            Intent intent = new Intent(AngkaLv0aActivity.this, AngkaLv0aActivity.class); //coba coba
-//                            intent.putExtra("id", id);
-                            // yg lama dicomen trs copast ini :
-                            intent.putExtra("id", String.valueOf(id_soal));
-                            startActivity(intent);
+                                            padjawabangka1.clear();
+                                            Intent intent = new Intent(AngkaLv0aActivity.this, LevelAngkaActivity.class);
+//                                          intent.putExtra("id", id);
+//                                          intent.putExtra("id", String.valueOf(id));
+                                            intent.putExtra("id", String.valueOf(id_soal));
+                                            startActivity(intent);
+                                        }
+                                    }).show();
                         } else {
                             pDialog.dismiss();
                             Log.e("testes", response.raw().toString());

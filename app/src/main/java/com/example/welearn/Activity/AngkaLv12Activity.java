@@ -51,10 +51,10 @@ public class AngkaLv12Activity extends AppCompatActivity {
     ImageView back, speaker, resetangka, submit;
     TextView levelangka, soalangka, soalnya, samadengan, isi_soal;
     CardView card_soalangka, card_reset, card_submit, card_soalangka1;
-    SignaturePad padjawabangka1;
+    SignaturePad padjawabangka1, padjawabangka2;
     TokenManager tokenManager;
 
-    private static final String TAG = "AngkaLv0aActivity";
+    private static final String TAG = "AngkaLv12Activity";
     public MainViewModel mMainViewModel;
 
     int id, id_soal;
@@ -142,10 +142,33 @@ public class AngkaLv12Activity extends AppCompatActivity {
             }
         });
 
+        padjawabangka2 = (SignaturePad) findViewById(R.id.padjawabangka2);
+        padjawabangka2.setOnSignedListener(new SignaturePad.OnSignedListener() {
+            @Override
+            public void onStartSigning() {
+
+            }
+
+            @Override
+            public void onSigned() {
+                card_submit.setEnabled(true);
+                card_reset.setEnabled(true);
+            }
+
+            @Override
+            public void onClear() {
+                card_submit.setEnabled(false);
+                card_reset.setEnabled(false);
+            }
+        });
+        {
+
+        }
         card_reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 padjawabangka1.clear();
+                padjawabangka2.clear();
             }
         });
         card_submit.setOnClickListener(new View.OnClickListener() {
@@ -159,10 +182,15 @@ public class AngkaLv12Activity extends AppCompatActivity {
                 }
 
                 Bitmap angkaBitmap = padjawabangka1.getTransparentSignatureBitmap();
+                Bitmap angkaBitmap2 = padjawabangka2.getTransparentSignatureBitmap();
+
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
 
                 angkaBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                 byte[] bitmap_data = byteArrayOutputStream.toByteArray();
+                angkaBitmap2.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream2);
+                byte[] bitmap_data2 = byteArrayOutputStream2.toByteArray();
 
                 FileOutputStream fos = null;
                 try {
@@ -178,8 +206,10 @@ public class AngkaLv12Activity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 String value = Base64.encodeToString(bitmap_data, Base64.DEFAULT); //image to base64
+                String value2 = Base64.encodeToString(bitmap_data2, Base64.DEFAULT); //image to base64
                 ArrayList<String> valueList = new ArrayList<>();
                 valueList.add(value);
+                valueList.add(value2);
 
                 Log.e("listfoto", String.valueOf(valueList.size()));
 
@@ -202,26 +232,54 @@ public class AngkaLv12Activity extends AppCompatActivity {
                 upload.enqueue(new Callback<ResponsePredict>() {
                     @Override
                     public void onResponse(Call<ResponsePredict> call, Response<ResponsePredict> response) {
-                        if (response.code() == 200) {
+                        if (response.code() == 200 && response.body().getMessage().equals("Benar")) {
                             Log.e("response", response.body().getMessage());
                             pDialog.dismiss();
-                            new SweetAlertDialog(AngkaLv12Activity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setTitleText(response.body().getMessage())
-                                    .setContentText("Berhasil Dikonfirmasi")
+                            new SweetAlertDialog(AngkaLv12Activity.this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+//                                    .setTitleText(response.body().getMessage())
+                                    .setTitleText("Jawabanmu : Benar")
+//                                    .setContentText("Jawaban Berhasil Disimpan")
+                                    .setContentText(response.body().getText())
+                                    .setCustomImage(R.drawable.happy)
                                     .setConfirmText("OK")
                                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sDialog) {
                                             sDialog.dismissWithAnimation();
 
+                                            padjawabangka1.clear();
+                                            padjawabangka2.clear();
+                                            Intent intent = new Intent(AngkaLv12Activity.this, LevelAngkaActivity.class);
+//                                          intent.putExtra("id", id);
+//                                          intent.putExtra("id", String.valueOf(id));
+                                            intent.putExtra("id", String.valueOf(id_soal));
+                                            startActivity(intent);
                                         }
                                     }).show();
+                        } else if (response.code() == 200 && response.body().getMessage().equals("Salah")) {
+                            Log.e("response", response.body().getMessage());
+                            pDialog.dismiss();
+                            new SweetAlertDialog(AngkaLv12Activity.this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+//                                    .setTitleText(response.body().getMessage())
+                                    .setTitleText("Jawabanmu : Salah")
+//                                    .setContentText("Jawaban Berhasil Disimpan")
+                                    .setContentText(response.body().getText())
+                                    .setCustomImage(R.drawable.sad)
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sDialog) {
+                                            sDialog.dismissWithAnimation();
 
-                            padjawabangka1.clear();
-                            Intent intent = new Intent(AngkaLv12Activity.this, AngkaLv2Activity.class); //coba coba
-//                            intent.putExtra("id", id);
-                            intent.putExtra("id", String.valueOf(id_soal));
-                            startActivity(intent);
+                                            padjawabangka1.clear();
+                                            padjawabangka2.clear();
+                                            Intent intent = new Intent(AngkaLv12Activity.this, LevelAngkaActivity.class);
+//                                          intent.putExtra("id", id);
+//                                          intent.putExtra("id", String.valueOf(id));
+                                            intent.putExtra("id", String.valueOf(id_soal));
+                                            startActivity(intent);
+                                        }
+                                    }).show();
                         } else {
                             pDialog.dismiss();
                             Log.e("testes", response.raw().toString());
